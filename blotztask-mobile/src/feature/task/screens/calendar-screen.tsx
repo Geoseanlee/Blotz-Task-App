@@ -127,59 +127,103 @@ export default function CalendarScreen() {
         onDateChanged={(date: string) => setSelectedDay(new Date(date))}
         showTodayButton={false}
       >
-        <WeekCalendar
-          onDayPress={(day: DateData) => setSelectedDay(new Date(day.dateString))}
-          current={format(selectedDay, "yyyy-MM-dd")}
-          theme={{
-            calendarBackground: "#F5F9FA", // incoming
-            selectedDayBackgroundColor: "#EBF0FE",
-            selectedDayTextColor: "#2d4150",
-            todayTextColor: "#2d4150",
+        <View className="mt-4">
+          <WeekCalendar
+            onDayPress={(day: DateData) => setSelectedDay(new Date(day.dateString))}
+            current={format(selectedDay, "yyyy-MM-dd")}
+            theme={{
+              calendarBackground: "#F5F9FA", // incoming
+              selectedDayBackgroundColor: "#EBF0FE",
+              selectedDayTextColor: "#2d4150",
+              todayTextColor: "#2d4150",
 
-            arrowColor: "#2d4150",
-            monthTextColor: "#2d4150",
-            textMonthFontWeight: "bold",
-            textDayFontWeight: "bold",
-            textDayHeaderFontWeight: "bold",
-            textDayFontFamily: "InterBold",
-            textDayHeaderFontFamily: "InterThin",
-          }}
-          dayComponent={({ date, state }) => {
-            const isToday = format(new Date(), "yyyy-MM-dd") === date?.dateString;
-            const isSelected = format(selectedDay, "yyyy-MM-dd") === date?.dateString;
-            
-            return (
-              <View className="items-center justify-center w-10 h-12">
-                {isToday && (
-                  <View className="w-2 h-2 bg-green-500 rounded-full mb-1" />
-                )}
-                <View 
-                  className={`w-8 h-8 items-center justify-center ${
-                    isSelected ? "bg-blue-50 rounded-md" : ""
-                  }`}
-                >
-                  <Pressable onPress={() => date && setSelectedDay(new Date(date.dateString))}>
-                    <Text 
-                      className={`text-sm font-bold ${
+              arrowColor: "#2d4150",
+              monthTextColor: "#2d4150",
+              textMonthFontWeight: "bold",
+              textDayFontWeight: "bold",
+              textDayHeaderFontWeight: "bold",
+              textDayFontFamily: "InterBold",
+              textDayHeaderFontFamily: "InterThin",
+            }}
+            dayComponent={({ date, state }) => {
+              const isToday = format(new Date(), "yyyy-MM-dd") === date?.dateString;
+              const isSelected = format(selectedDay, "yyyy-MM-dd") === date?.dateString;
+              // Weekday
+              const dayofWeek = format(new Date(date?.dateString ?? ""), "E");
+              const isWeekday = dayofWeek !== "Sat" && dayofWeek !== "Sun";
+
+              return (
+                <>
+                  {/* Current Day Indicator Spot */}
+                  <View className="w-2 h-2 mb-1">
+                    {isToday && <View className="w-2 h-2 bg-black rounded-full" />}
+                  </View>
+
+                  <Pressable
+                    onPress={() => date && setSelectedDay(new Date(date.dateString))}
+                    // use Pressable as the root to provide better UX
+                    className={`items-center justify-center w-10 h16 rounded-lg ${
+                      isSelected ? "bg-gray-100" : "" // When Selected, shows grey background
+                    }`}
+                  >
+                    {/* Date Figures */}
+                    <Text
+                      className={`font-bold text-lg ${
+                        // larger text for figures
                         state === "disabled" ? "text-gray-300" : "text-black"
                       }`}
                     >
                       {date?.day}
                     </Text>
-                  </Pressable>
-                </View>
-              </View>
-            );
-          }}
-          allowShadow={false}
-          firstDay={1}
-        />
 
-        <TaskStatusSelect
-          statuses={taskStatuses}
-          selectedStatusId={selectedStatus}
-          onChange={setSelectedStatus}
-        />
+                    {/* Weekday Text */}
+                    <Text
+                      className={`text-[13px] ${
+                        // smaller text for weekday's abbr.
+                        state === "disabled" ? "text-gray-300" : "text-black"
+                      }`}
+                    >
+                      {dayofWeek}
+                    </Text>
+
+                    {/* <View className="items-center justify-center w-10 h-12">
+                      {isToday && (
+                        <View className="w-2 h-2 bg-black rounded-full mb-1" />
+                      )}
+                      <View 
+                        className={`w-8 h-8 items-center justify-center ${
+                          isSelected ? "bg-blue-50 rounded-md" : ""
+                        }`}
+                      >
+                        <Pressable onPress={() => date && setSelectedDay(new Date(date.dateString))}>
+                          <Text 
+                            className={`text-sm font-bold ${
+                              state === "disabled" ? "text-gray-300" : "text-black"
+                            }`}
+                          >
+                            {date?.day}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View> */}
+                  </Pressable>
+                </>
+              );
+            }}
+            allowShadow={false}
+            firstDay={1}
+            hideDayNames={true}
+          />
+        </View>
+
+        {/* Status Selector */}
+        <View className="mt-4">
+          <TaskStatusSelect
+            statuses={taskStatuses}
+            selectedStatusId={selectedStatus}
+            onChange={setSelectedStatus}
+          />
+        </View>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
